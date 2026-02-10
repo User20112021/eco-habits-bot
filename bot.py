@@ -26,6 +26,7 @@ if not TOKEN:
     raise RuntimeError("Не задан BOT_TOKEN. Добавьте переменную окружения BOT_TOKEN со значением токена BotFather.")
 
 ADMIN_ID = 7919965678
+admin_delete_pending = False
 TIMEZONE = os.getenv("BOT_TZ", "Europe/Berlin")
 PING_HOUR = int(os.getenv("BOT_PING_HOUR", "19"))
 PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "0"))
@@ -255,7 +256,8 @@ async def cmd_help(m: Message):
         "/checkin — отметить привычки за сегодня\n"
         "/stats — моя статистика\n"
         "/setclass — поменять класс\n"
-        "/reset - сброс статистики\n\n"
+        "/admin_reset - сброс статистики\n"
+        "/admin_delete - удалить все данные \n\n"
         "Также можно пользоваться кнопками меню.",
         reply_markup=main_menu_kb()
     )
@@ -358,7 +360,7 @@ async def send_school_stats(m: Message):
     )
     await m.answer(text, parse_mode="Markdown", reply_markup=main_menu_kb())
 
-@dp.message(Command("reset"))
+@dp.message(Command("admin_reset"))
 async def reset_stats(m: Message):
     # Проверяем администратора
     if m.from_user.id != ADMIN_ID:
@@ -370,6 +372,39 @@ async def reset_stats(m: Message):
         conn.execute("DELETE FROM checkins")
 
     await m.answer("Статистика успешно обнулена.")
+
+@dp.message(Command("admin_delete"))
+async def admin_delete_request(m: Message):
+    global admin_delete_pending
+
+    if m.from_user.id != ADMIN_ID:
+        await m.answer("Только для администратора.")
+        return
+
+    admin_delete_pending = True
+    await m.answer(
+        "⚠️ Будут удалены ВСЕ участники и статистика.\n"
+        "Для подтверждения отправьте /admin_del"
+    )
+
+@dp.message(Command("admin_del"))
+async def admin_delete_confirm(m: Message):
+    global admin_delete_pending
+
+    if m.from_user.id != ADMIN_ID:
+        await m.answer("Только для администратора.")
+        return
+
+    if not admin_delete_pending:
+        await m.answer("Нет ожидающего удаления.")
+        return
+
+    with db() as conn:
+        conn.execute("DELETE FROM checkins")
+        conn.execute("DELETE FROM users")
+
+    admin_delete_pending = False
+    await m.answer("База очищена. Акция начата заново.")
     
 # ======= Меню-кнопки (ReplyKeyboard) =======
 @dp.message(F.text == "✅ Отметить сегодня")

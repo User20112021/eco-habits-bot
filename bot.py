@@ -28,8 +28,8 @@ if not TOKEN:
 ADMIN_ID = 7919965678
 admin_delete_pending = False
 TIMEZONE = os.getenv("BOT_TZ", "Europe/Berlin")
-PING_HOUR = int(os.getenv("BOT_PING_HOUR", "19"))
-PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "0"))
+PING_HOUR = int(os.getenv("BOT_PING_HOUR", "21"))
+PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "25"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
 
 # Доступные классы в первом релизе
@@ -255,7 +255,8 @@ async def cmd_help(m: Message):
         "/start — подключиться\n"
         "/checkin — отметить привычки за сегодня\n"
         "/stats — моя статистика\n"
-        "/setclass — поменять класс\n"
+        "/setclass — поменять класс\n\n"
+        "Команды администратора:\n"
         "/admin_reset - сброс статистики\n"
         "/admin_delete - удалить все данные \n\n"
         "Также можно пользоваться кнопками меню.",
@@ -378,7 +379,7 @@ async def admin_delete_request(m: Message):
     global admin_delete_pending
 
     if m.from_user.id != ADMIN_ID:
-        await m.answer("Только для администратора.")
+        await m.answer("Эта команда доступна только администратору.")
         return
 
     admin_delete_pending = True
@@ -392,7 +393,7 @@ async def admin_delete_confirm(m: Message):
     global admin_delete_pending
 
     if m.from_user.id != ADMIN_ID:
-        await m.answer("Только для администратора.")
+        await m.answer("Эта команда доступна только администратору.")
         return
 
     if not admin_delete_pending:
@@ -462,7 +463,7 @@ async def evening_ping():
 
             await bot.send_message(
                 uid,
-                f"Вечерний эко-чек-ин 🌙\nОтметьте действия за сегодня ({day_str}):",
+                f"Вечерний эко-чек🌙\nОтметьте действия за сегодня ({day_str}):",
                 reply_markup=habits_kb(uid, day_str)
             )
         except Exception as e:

@@ -4,6 +4,7 @@ import os
 import sqlite3
 from dataclasses import dataclass
 from datetime import date, datetime
+import pytz
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
@@ -28,8 +29,8 @@ if not TOKEN:
 ADMIN_ID = 7919965678
 admin_delete_pending = False
 TIMEZONE = os.getenv("BOT_TZ", "Europe/Moscow")
-PING_HOUR = int(os.getenv("BOT_PING_HOUR", "23"))
-PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "35"))
+PING_HOUR = int(os.getenv("BOT_PING_HOUR", "0"))
+PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "40"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
 
 # Доступные классы в первом релизе
@@ -80,6 +81,25 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS meta (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+            """)
+
+def get_meta(key: str):
+    with db() as conn:
+        row = conn.execute("SELECT value FROM meta WHERE key = ?", (key,)).fetchone()
+        return row[0] if row else None
+
+def set_meta(key: str, value: str):
+    with db() as conn:
+        conn.execute(
+            "INSERT INTO meta(key, value) VALUES(?, ?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            (key, value),
+        )
 
 def upsert_user(user_id: int, username: str | None, first_name: str | None):
     with db() as conn:
@@ -177,6 +197,8 @@ def get_group_stats(where_sql: str = "", params: tuple = ()):
         """, params).fetchall()
 
         return users_count, total_actions, days_count, by_habit
+
+
 
 # =========================
 #  КНОПКИ
@@ -469,6 +491,30 @@ async def evening_ping():
         except Exception as e:
             # например, пользователь заблокировал бота
             log.warning("Не удалось отправить сообщение пользователю %s: %s", uid, e)
+    
+    # отмечаем, что сегодня рассылка уже была
+    try:
+        tz = pytz.timezone(TIMEZONE)
+        today_key = datetime.now(tz).strftime("%Y-%m-%d")
+        set_meta("last_evening_ping", today_key)
+    except Exception as e:
+        log.warning("Не удалось записать meta last_evening_ping: %s", e)
+
+async def catch_up_evening_ping():
+    tz = pytz.timezone(TIMEZONE)
+    now = datetime.now(tz)
+
+    target = now.replace(hour=PING_HOUR, minute=PING_MINUTE, second=0, microsecond=0)
+
+    today_key = now.strftime("%Y-%m-%d")
+    last_sent = get_meta("last_evening_ping")
+
+    if last_sent == today_key:
+        return
+
+    if now >= target:
+        await evening_ping()
+        set_meta("last_evening_ping", today_key)
 
 from aiohttp import web
 async def health_server():
@@ -501,6 +547,7 @@ async def main():
     scheduler.start()
 
     log.info("Eco Habits Bot запущен")
+    await catch_up_evening_ping()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

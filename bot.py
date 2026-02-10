@@ -27,9 +27,9 @@ if not TOKEN:
 
 ADMIN_ID = 7919965678
 admin_delete_pending = False
-TIMEZONE = os.getenv("BOT_TZ", "Europe/Berlin")
-PING_HOUR = int(os.getenv("BOT_PING_HOUR", "21"))
-PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "25"))
+TIMEZONE = os.getenv("BOT_TZ", "Europe/Moscow")
+PING_HOUR = int(os.getenv("BOT_PING_HOUR", "23"))
+PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "35"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
 
 # Доступные классы в первом релизе

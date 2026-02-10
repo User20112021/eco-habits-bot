@@ -419,9 +419,25 @@ async def evening_ping():
             # например, пользователь заблокировал бота
             log.warning("Не удалось отправить сообщение пользователю %s: %s", uid, e)
 
+from aiohttp import web
+
+async def health_server():
+    app = web.Application()
+
+    async def ok(_):
+        return web.Response(text="OK")
+
+    app.router.add_get("/", ok)
+
+    port = int(os.getenv("PORT", "10000"))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+
 async def main():
     init_db()
-
+await health_server()
     scheduler = AsyncIOScheduler(timezone=TIMEZONE)
     scheduler.add_job(
         evening_ping,

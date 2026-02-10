@@ -29,8 +29,8 @@ if not TOKEN:
 ADMIN_ID = 7919965678
 admin_delete_pending = False
 TIMEZONE = os.getenv("BOT_TZ", "Europe/Moscow")
-PING_HOUR = int(os.getenv("BOT_PING_HOUR", "0"))
-PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "40"))
+PING_HOUR = int(os.getenv("BOT_PING_HOUR", "1"))
+PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "0"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
 
 # Доступные классы в первом релизе
@@ -548,6 +548,8 @@ async def main():
 
     log.info("Eco Habits Bot запущен")
     await catch_up_evening_ping()
+
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

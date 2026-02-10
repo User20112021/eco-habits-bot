@@ -420,7 +420,6 @@ async def evening_ping():
             log.warning("Не удалось отправить сообщение пользователю %s: %s", uid, e)
 
 from aiohttp import web
-
 async def health_server():
     app = web.Application()
 
@@ -437,7 +436,10 @@ async def health_server():
 
 async def main():
     init_db()
-await health_server()
+
+    # Порт для Render
+    await health_server()
+
     scheduler = AsyncIOScheduler(timezone=TIMEZONE)
     scheduler.add_job(
         evening_ping,
@@ -447,7 +449,7 @@ await health_server()
     )
     scheduler.start()
 
-    log.info("Eco Habits Bot запущен. TZ=%s, ping=%02d:%02d", TIMEZONE, PING_HOUR, PING_MINUTE)
+    log.info("Eco Habits Bot запущен")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

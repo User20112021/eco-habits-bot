@@ -25,6 +25,7 @@ TOKEN = os.getenv("BOT_TOKEN", "").strip()
 if not TOKEN:
     raise RuntimeError("Не задан BOT_TOKEN. Добавьте переменную окружения BOT_TOKEN со значением токена BotFather.")
 
+ADMIN_ID = 7919965678
 TIMEZONE = os.getenv("BOT_TZ", "Europe/Berlin")
 PING_HOUR = int(os.getenv("BOT_PING_HOUR", "19"))
 PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "0"))
@@ -41,7 +42,7 @@ HABITS = [
     ("no_cup", "🥤 Не пью из одноразового стаканчика"),
     ("no_bag", "🛍️ Не использую пластиковый пакет"),
     ("trash_place", "🗑️ Мусор - в отведённые места"),
-    ("eco_move", "🚶 Пешком/экологичный транспорт"),
+    ("eco_move", "🚲🚶 Пешком/экологичный транспорт"),
 ]
 
 # =========================
@@ -254,6 +255,7 @@ async def cmd_help(m: Message):
         "/checkin — отметить привычки за сегодня\n"
         "/stats — моя статистика\n"
         "/setclass — поменять класс\n\n"
+        "/reset - сброс статистики"
         "Также можно пользоваться кнопками меню.",
         reply_markup=main_menu_kb()
     )
@@ -356,6 +358,19 @@ async def send_school_stats(m: Message):
     )
     await m.answer(text, parse_mode="Markdown", reply_markup=main_menu_kb())
 
+@dp.message(Command("reset"))
+async def reset_stats(m: Message):
+    # Проверяем администратора
+    if m.from_user.id != ADMIN_ID:
+        await m.answer("Эта команда доступна только администратору.")
+        return
+
+    # Очищаем статистику привычек
+    with db() as conn:
+        conn.execute("DELETE FROM checkins")
+
+    await m.answer("Статистика успешно обнулена.")
+    
 # ======= Меню-кнопки (ReplyKeyboard) =======
 @dp.message(F.text == "✅ Отметить сегодня")
 async def menu_checkin(m: Message):

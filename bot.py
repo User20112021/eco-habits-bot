@@ -28,7 +28,7 @@ if not TOKEN:
 
 ADMIN_ID = 7919965678
 admin_delete_pending = False
-TIMEZONE = "UTC"
+TIMEZONE = os.getenv("BOT_TZ", "UTC")
 PING_HOUR = int(os.getenv("BOT_PING_HOUR", "11"))
 PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "00"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
@@ -539,7 +539,7 @@ async def main():
     # Порт для Render
     await health_server()
 
-    scheduler = AsyncIOScheduler(timezone=tz)
+    scheduler = AsyncIOScheduler(timezone=TIMEZONE)
     job=scheduler.add_job(
         evening_ping,
         CronTrigger(hour=PING_HOUR, minute=PING_MINUTE),

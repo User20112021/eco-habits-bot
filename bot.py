@@ -538,7 +538,7 @@ async def main():
     await health_server()
 
     scheduler = AsyncIOScheduler(timezone=TIMEZONE)
-    scheduler.add_job(
+    job=scheduler.add_job(
         evening_ping,
         CronTrigger(hour=PING_HOUR, minute=PING_MINUTE),
         id="evening_ping",

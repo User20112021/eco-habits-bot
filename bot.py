@@ -260,13 +260,13 @@ async def cmd_start(m: Message):
     user_class = get_user_class(m.from_user.id)
     if not user_class:
         await m.answer(
-            "Привет! Я бот трекера эко-привычек 🌿\n\n"
-            "Сначала выберите Ваш класс (это нужно для статистики класса и школы).",
+            "Привет!🌏 Я бот трекера эко-привычек 🌱\n\n"
+            "Сначала выберите свой класс (это нужно для статистики класса и школы).",
             reply_markup=class_pick_kb(),
         )
     else:
         await m.answer(
-            "Привет! Вы уже подключены 🌿\n"
+            "Привет! Вы уже подключены 🌱\n"
             "Нажмите «✅ Отметить сегодня» или используйте меню.",
             reply_markup=main_menu_kb()
         )
@@ -314,7 +314,7 @@ async def cmd_checkin(m: Message):
         return
     day_str = date.today().isoformat()
     await m.answer(
-        f"Отметьте эко-действия за сегодня ({day_str}):",
+        f"Отметьте эко-действия за сегодня🌱 ({day_str}):",
         reply_markup=habits_kb(m.from_user.id, day_str)
     )
 
@@ -487,7 +487,7 @@ async def cb_done(cb: CallbackQuery):
     selected = get_user_day_habits(cb.from_user.id, day_str)
     await cb.answer("Сохранено!")
     await cb.message.answer(
-        f"Спасибо! За {day_str} отмечено привычек: {len(selected)} ✅",
+        f"Спасибо!🌏 За {day_str} отмечено привычек: {len(selected)} ✅",
         reply_markup=main_menu_kb()
     )
 
@@ -509,7 +509,7 @@ async def evening_ping():
 
             await bot.send_message(
                 uid,
-                f"Вечерний эко-чек🌆\nОтметьте действия за сегодня ({day_str}):",
+                f"🌿Вечерний эко-чек🌆\nОтметьте действия за сегодня ({day_str}):",
                 reply_markup=habits_kb(uid, day_str)
             )
         except Exception as e:

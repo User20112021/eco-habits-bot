@@ -28,9 +28,9 @@ if not TOKEN:
 
 ADMIN_ID = 7919965678
 admin_delete_pending = False
-TIMEZONE = os.getenv("BOT_TZ", "Europe/Moscow")
-PING_HOUR = int(os.getenv("BOT_PING_HOUR", "9"))
-PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "0"))
+TIMEZONE = os.getenv("BOT_TZ", "Europe/Istanbul")
+PING_HOUR = int(os.getenv("BOT_PING_HOUR", "10"))
+PING_MINUTE = int(os.getenv("BOT_PING_MINUTE", "50"))
 DB_PATH = os.getenv("BOT_DB_PATH", "eco_tracker.db")
 
 # Доступные классы в первом релизе
@@ -44,7 +44,7 @@ HABITS = [
     ("no_cup", "🥤 Не пью из одноразового стаканчика"),
     ("no_bag", "🛍️ Не использую пластиковый пакет"),
     ("trash_place", "🗑️ Мусор кладу в отведённые места"),
-    ("eco_move", "🛴🚶 Пешком/экологичный транспорт"),
+    ("eco_move", "🛴🚶 Пешком /экологичный транспорт"),
 ]
 
 # =========================

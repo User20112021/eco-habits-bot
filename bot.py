@@ -302,7 +302,7 @@ async def cb_setclass(cb: CallbackQuery):
     await cb.answer("Класс сохранён!")
     await cb.message.answer(
         f"Готово ✅ Ваш класс: {class_name}\n"
-        "Теперь можно отмечать привычки.",
+        "Теперь можно отмечать привычки🌱",
         reply_markup=main_menu_kb()
     )
 
@@ -487,7 +487,8 @@ async def cb_done(cb: CallbackQuery):
     selected = get_user_day_habits(cb.from_user.id, day_str)
     await cb.answer("Сохранено!")
     await cb.message.answer(
-        f"Спасибо!🌏 За {day_str} отмечено привычек: {len(selected)} ✅",
+        f"Спасибо!🌏 За {day_str} отмечено привычек: {len(selected)} ✅/n"
+        "Трекер будет напоминать каждый вечер/n",
         reply_markup=main_menu_kb()
     )
 

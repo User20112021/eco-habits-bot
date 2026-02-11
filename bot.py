@@ -27,6 +27,7 @@ if not TOKEN:
     raise RuntimeError("Не задан BOT_TOKEN. Добавьте переменную окружения BOT_TOKEN со значением токена BotFather.")
 
 ADMIN_ID = 7919965678
+admin_reset_pending = False
 admin_delete_pending = False
 TIMEZONE = os.getenv("BOT_TZ", "UTC")
 PING_HOUR = int(os.getenv("BOT_PING_HOUR", "18"))
@@ -385,21 +386,42 @@ async def send_school_stats(m: Message):
 
 @dp.message(Command("admin_reset"))
 async def reset_stats(m: Message):
+    global admin_reset_pending
+    
     # Проверяем администратора
     if m.from_user.id != ADMIN_ID:
         await m.answer("Эта команда доступна только администратору.")
         return
 
-    # Очищаем статистику привычек
-    with db() as conn:
-        conn.execute("DELETE FROM checkins")
+    admin_reset_pending = True
+    await m.answer(
+        "⚠️ Будет сброшена ВСЯ статистика, участники останутся.\n"
+        "Для подтверждения отправьте /admin_res"
+    )
+@dp.message(Command("admin_res"))
+async def admin_reset_confirm(m: Message):
+    global admin_reset_pending
 
-    await m.answer("Статистика успешно обнулена.")
+    if m.from_user.id != ADMIN_ID:
+        await m.answer("Эта команда доступна только администратору.")
+        return
+
+    if not admin_reset_pending:
+        await m.answer("Нет ожидающего сброса.")
+        return
+
+    with db() as conn:
+        conn.execute("DELETE FROM checkins")                 # сброс статистики
+        conn.execute("DELETE FROM meta WHERE key = ?", ("last_evening_ping",))  # чтобы рассылка снова работала “с нуля”
+
+    admin_reset_pending = False
+    await m.answer("Статистика сброшена. Участники сохранены.")
 
 @dp.message(Command("admin_delete"))
 async def admin_delete_request(m: Message):
     global admin_delete_pending
 
+    # Проверяем администратора
     if m.from_user.id != ADMIN_ID:
         await m.answer("Эта команда доступна только администратору.")
         return

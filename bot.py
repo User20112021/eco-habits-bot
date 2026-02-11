@@ -475,7 +475,7 @@ async def cb_done(cb: CallbackQuery):
 async def evening_ping():
     print("EVENING_PING fired", datetime.now(pytz.timezone(TIMEZONE)))
     
-    day_str = date.today().isoformat()
+    day_str = datetime.now(pytz.timezone(TIMEZONE)).date().isoformat()
     users = get_all_users()
     for uid in users:
         try:

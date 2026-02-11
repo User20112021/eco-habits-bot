@@ -509,7 +509,7 @@ async def evening_ping():
 
             await bot.send_message(
                 uid,
-                f"Вечерний эко-чек🌙\nОтметьте действия за сегодня ({day_str}):",
+                f"Вечерний эко-чек🌆\nОтметьте действия за сегодня ({day_str}):",
                 reply_markup=habits_kb(uid, day_str)
             )
         except Exception as e:

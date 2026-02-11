@@ -543,9 +543,15 @@ async def main():
         CronTrigger(hour=PING_HOUR, minute=PING_MINUTE),
         id="evening_ping",
         replace_existing=True,
+        misfire_grace_time=3600,   # 1 час “прощения”
+        coalesce=True              # если пропустили несколько запусков — выполнить один
     )
     scheduler.start()
 
+    print("SCHEDULER STARTED, TZ=", TIMEZONE)
+    print("PING TIME =", PING_HOUR, ":", PING_MINUTE)
+    print("NEXT RUN =", job.next_run_time)   
+   
     log.info("Eco Habits Bot запущен")
     await catch_up_evening_ping()
 

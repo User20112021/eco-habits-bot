@@ -473,6 +473,8 @@ async def cb_done(cb: CallbackQuery):
 #  ЕЖЕДНЕВНЫЙ ВЕЧЕРНИЙ ПИНГ
 # =========================
 async def evening_ping():
+    print("EVENING_PING fired", datetime.now(pytz.timezone(TIMEZONE)))
+    
     day_str = date.today().isoformat()
     users = get_all_users()
     for uid in users:

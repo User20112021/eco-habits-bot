@@ -59,9 +59,9 @@
 
 ## 5) Настройки времени (по желанию)
 Можно изменить через переменные окружения:
-- BOT_TZ (по умолчанию Europe/Berlin)
-- BOT_PING_HOUR (по умолчанию 19)
-- BOT_PING_MINUTE (по умолчанию 0)
+- BOT_TZ
+- BOT_PING_HOUR
+- BOT_PING_MINUTE
 
 Пример (Linux/macOS):
 `export BOT_PING_HOUR="18"`
